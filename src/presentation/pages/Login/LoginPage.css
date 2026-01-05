@@ -1,0 +1,17 @@
+.login-page {
+  display: flex;
+  height: 100vh;
+  background-color: white;
+}
+
+.login-left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-right {
+  flex: 1;
+  padding: 1rem;
+}

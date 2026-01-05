@@ -1,0 +1,20 @@
+.welcome-banner {
+  background: linear-gradient(0deg, #000000 0%, #094CDB 44%);
+  color: white;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 3rem;
+  border-radius: 20px;
+}
+
+.welcome-banner p {
+  font-size: 4rem;
+  font-weight: 400; /* em vez de bold */
+}
+
+
+input, button, a {
+  font-family: inherit;
+}
