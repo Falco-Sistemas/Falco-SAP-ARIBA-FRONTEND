@@ -1,0 +1,105 @@
+.cart-summary {
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.summary-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-section {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.subtotal-row .label {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.subtotal-row .value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.summary-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.summary-item .item-name {
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.summary-item .item-qty {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.summary-item .item-price {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    min-width: 80px;
+    text-align: right;
+}
+
+.summary-total {
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.total-row .label {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.total-row .value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.punchout-btn {
+    width: 100%;
+    padding: 1rem;
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.punchout-btn:hover {
+    background-color: #1d4ed8;
+}

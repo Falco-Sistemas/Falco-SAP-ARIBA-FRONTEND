@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './CatalogPage.css';
 
 import CatalogHeader from '../../components/Catalog/CatalogHeader/CatalogHeader';
@@ -23,6 +24,8 @@ const mockProducts: CatalogProduct[] = [
 const sortOptions = ['Maior para Menor', 'Menor para Maior', 'A-Z', 'Z-A'];
 
 function CatalogoPage() {
+    const navigate = useNavigate();
+
     // State
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedSort, setSelectedSort] = useState('Maior para Menor');
@@ -46,13 +49,11 @@ function CatalogoPage() {
     };
 
     const handleProductDetails = (product: CatalogProduct) => {
-        console.log('View details:', product);
-        // Here you would navigate to product details page
+        navigate(`/produto/${product.id}`);
     };
 
     const handleCartClick = () => {
-        console.log('Open cart');
-        // Here you would open cart modal or navigate to cart
+        navigate('/carrinho');
     };
 
     const handlePunchOutClick = () => {
