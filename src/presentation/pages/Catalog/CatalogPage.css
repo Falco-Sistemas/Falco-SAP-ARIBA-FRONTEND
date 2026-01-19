@@ -1,0 +1,10 @@
+.catalogo-page {
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+.catalogo-content {
+    background-color: #f5f5f5;
+    min-height: calc(100vh - 200px);
+    padding-bottom: 2rem;
+}

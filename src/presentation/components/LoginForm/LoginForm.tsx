@@ -7,16 +7,16 @@ function LoginForm() {
 
         <form>
             <div className="field">
-                <label htmlFor="login">Login</label>
+                <label htmlFor="login">Usuário</label>
                 <input type="text" id="login" name="login" />
             </div>
 
             <div className="field">
-                <label htmlFor="password">Password</label>
+                <label htmlFor="password">Senha</label>
                 <input type="password" id="password" name="password" /> 
             </div>
 
-            <button type="submit">Login</button>
+            <button type="submit">Entrar</button>
 
             <a href="#" className="forgot-password">Esqueci a senha</a>
         </form>
