@@ -4,32 +4,8 @@ import './CartPage.css';
 import CartHeader from '../../components/Cart/CartHeader/CartHeader';
 import CartNavigation from '../../components/Cart/CartNavigation/CartNavigation';
 import CartItem from '../../components/Cart/CartItem/CartItem';
-import type { CartProduct } from '../../components/Cart/CartItem/CartItem';
 import CartSummary from '../../components/Cart/CartSummary/CartSummary';
-
-const mockCartItems: CartProduct[] = [
-    {
-        id: 1,
-        category: 'Suprimentos Escritório',
-        name: 'Papel Sulfite A4 500 folhas',
-        price: 29.90,
-        quantity: 2
-    },
-    {
-        id: 2,
-        category: 'Suprimentos Escritório',
-        name: 'Caneta Esferográfica Azul (caixa)',
-        price: 24.50,
-        quantity: 1
-    },
-    {
-        id: 3,
-        category: 'Equipamentos',
-        name: 'Monitor LED 24 polegadas',
-        price: 899.00,
-        quantity: 1
-    }
-];
+import { useCart } from '../../contexts/CartContext';
 
 const tabs = [
     { id: 'cart', label: 'Carrinho de Compras' },
@@ -39,8 +15,10 @@ const tabs = [
 function CartPage() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState('cart');
-    const [cartItems, setCartItems] = useState<CartProduct[]>(mockCartItems);
     const [searchQuery, setSearchQuery] = useState('');
+
+    // Use cart context
+    const { items, totalItems, updateQuantity, removeFromCart, clearCart } = useCart();
 
     const handleTabChange = (tabId: string) => {
         setActiveTab(tabId);
@@ -54,15 +32,11 @@ function CartPage() {
     };
 
     const handleQuantityChange = (id: number, quantity: number) => {
-        setCartItems(prevItems =>
-            prevItems.map(item =>
-                item.id === id ? { ...item, quantity } : item
-            )
-        );
+        updateQuantity(id, quantity);
     };
 
     const handleRemoveItem = (id: number) => {
-        setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+        removeFromCart(id);
     };
 
     const handleCartClick = () => {
@@ -71,20 +45,22 @@ function CartPage() {
 
     const handlePunchOut = () => {
         console.log('PunchOut clicked - sending cart to SAP Ariba');
+        console.log('Cart items:', items);
         alert('Carrinho enviado para SAP Ariba!');
+        clearCart();
     };
 
-    const filteredItems = cartItems.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchQuery.toLowerCase())
+    // Filter items by search
+    const filteredItems = items.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
         <div className="cart-page">
             <CartHeader
                 title="Carrinho de Compras"
-                subtitle="Revise seus itens antes de finalizar"
-                userName="João Silva"
+                subtitle={`${totalItems} ${totalItems === 1 ? 'item' : 'itens'} no carrinho`}
+                userName="User_ID"
                 language="PT"
                 onCartClick={handleCartClick}
             />
@@ -109,15 +85,29 @@ function CartPage() {
                         ))
                     ) : (
                         <div className="empty-cart">
-                            <p>Seu carrinho está vazio</p>
+                            {items.length === 0 ? (
+                                <>
+                                    <p>Seu carrinho está vazio</p>
+                                    <button
+                                        className="continue-shopping-btn"
+                                        onClick={() => navigate('/')}
+                                    >
+                                        Continuar Comprando
+                                    </button>
+                                </>
+                            ) : (
+                                <p>Nenhum item encontrado para "{searchQuery}"</p>
+                            )}
                         </div>
                     )}
                 </div>
 
-                <CartSummary
-                    items={cartItems}
-                    onPunchOut={handlePunchOut}
-                />
+                {items.length > 0 && (
+                    <CartSummary
+                        items={items}
+                        onPunchOut={handlePunchOut}
+                    />
+                )}
             </main>
         </div>
     );

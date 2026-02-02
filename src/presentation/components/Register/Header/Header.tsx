@@ -36,3 +36,5 @@ function Header({ title, subtitle, userName, language }: HeaderProps) {
         </header>
     );
 }
+
+export default Header;

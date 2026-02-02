@@ -1,8 +1,8 @@
 import './CartSummary.css';
-import type { CartProduct } from '../CartItem/CartItem';
+import type { CartItem } from '../../../../domain/entities/Cart';
 
 interface CartSummaryProps {
-    items: CartProduct[];
+    items: CartItem[];
     onPunchOut: () => void;
 }
 
@@ -15,12 +15,17 @@ function CartSummary({ items, onPunchOut }: CartSummaryProps) {
     };
 
     const subtotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const totalItems = items.reduce((total, item) => total + item.quantity, 0);
 
     return (
         <div className="cart-summary">
-            <h2 className="summary-title">Resumo</h2>
+            <h2 className="summary-title">Resumo do Pedido</h2>
 
             <div className="summary-section">
+                <div className="summary-row">
+                    <span className="label">Itens:</span>
+                    <span className="value">{totalItems}</span>
+                </div>
                 <div className="summary-row subtotal-row">
                     <span className="label">Subtotal:</span>
                     <span className="value">{formatPrice(subtotal)}</span>
@@ -31,7 +36,7 @@ function CartSummary({ items, onPunchOut }: CartSummaryProps) {
                 {items.map((item) => (
                     <div key={item.id} className="summary-item">
                         <span className="item-name">{item.name}</span>
-                        <span className="item-qty">{item.quantity} Unidade{item.quantity > 1 ? 's' : ''}</span>
+                        <span className="item-qty">{item.quantity}x</span>
                         <span className="item-price">{formatPrice(item.price * item.quantity)}</span>
                     </div>
                 ))}
@@ -45,7 +50,7 @@ function CartSummary({ items, onPunchOut }: CartSummaryProps) {
             </div>
 
             <button className="punchout-btn" onClick={onPunchOut}>
-                PunchOut
+                Finalizar Pedido (PunchOut)
             </button>
         </div>
     );

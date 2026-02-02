@@ -7,44 +7,44 @@ import CatalogNavigation from '../../components/Catalog/CatalogNavigation/Catalo
 import FilterBar from '../../components/Catalog/FilterBar/FilterBar';
 import ProductGrid from '../../components/Catalog/ProductGrid/ProductGrid';
 import Pagination from '../../components/Catalog/Pagination/Pagination';
-import type { CatalogProduct } from '../../components/Catalog/ProductGrid/ProductCard/ProductCard';
 
-// Mock data - in real app this comes from API
-const mockProducts: CatalogProduct[] = [
-    { id: 1, name: 'Botina Amarrar N° 41', price: 41.00 },
-    { id: 2, name: 'Botina Amarrar N° 41', price: 41.00 },
-    { id: 3, name: 'Botina Amarrar N° 41', price: 41.00 },
-    { id: 4, name: 'Botina Amarrar N° 41', price: 41.00 },
-    { id: 5, name: 'Botina Amarrar N° 41', price: 41.00 },
-    { id: 6, name: 'Botina Amarrar N° 41', price: 41.00 },
-    { id: 7, name: 'Botina Amarrar N° 41', price: 41.00 },
-    { id: 8, name: 'Botina Amarrar N° 41', price: 41.00 },
-];
+import { useProducts } from '../../hooks/useProducts';
+import { useCart } from '../../contexts/CartContext';
+import type { CatalogProduct } from '../../../domain/entities/Product';
+
 
 const sortOptions = ['Maior para Menor', 'Menor para Maior', 'A-Z', 'Z-A'];
+
+const sortMapping: Record<string, string> = {
+    'Maior para Menor': 'price_desc',
+    'Menor para Maior': 'price_asc',
+    'A-Z': 'name_asc',
+    'Z-A': 'name_desc',
+};
 
 function CatalogoPage() {
     const navigate = useNavigate();
 
-    // State
-    const [searchQuery, setSearchQuery] = useState('');
+    // Use cart context for global cart state
+    const { totalItems, addToCart } = useCart();
+
+    // Use products hook for catalog data
+    const {
+        products,
+        currentPage,
+        totalPages,
+        totalItems: totalProducts,
+        isLoading,
+        error,
+        handleSearch,
+        handleSortChange,
+        handlePageChange,
+    } = useProducts(8);
+
     const [selectedSort, setSelectedSort] = useState('Maior para Menor');
-    const [currentPage, setCurrentPage] = useState(3);
-    const [cartCount, setCartCount] = useState(4);
-
-    // Handlers
-    const handleSearch = (query: string) => {
-        setSearchQuery(query);
-        console.log('Searching:', query);
-    };
-
-    const handleSortChange = (sort: string) => {
-        setSelectedSort(sort);
-        console.log('Sort changed:', sort);
-    };
 
     const handleAddToCart = (product: CatalogProduct, quantity: number) => {
-        setCartCount(cartCount + quantity);
+        addToCart(product, quantity);
         console.log('Added to cart:', product.name, 'Quantity:', quantity);
     };
 
@@ -57,25 +57,21 @@ function CatalogoPage() {
     };
 
     const handlePunchOutClick = () => {
-        console.log('PunchOut clicked');
+        navigate('/carrinho');
     };
 
-    const handlePageChange = (page: number) => {
-        setCurrentPage(page);
-        console.log('Page:', page);
+    const onSortChange = (displaySort: string) => {
+        setSelectedSort(displaySort);
+        const apiSort = sortMapping[displaySort] || 'price_desc';
+        handleSortChange(apiSort);
     };
-
-    // Filter products by search
-    const filteredProducts = mockProducts.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
     return (
         <div className="catalogo-page">
             <CatalogHeader
                 userName="User_ID"
                 language="Português"
-                cartItemCount={cartCount}
+                cartItemCount={totalItems}
                 onCartClick={handleCartClick}
                 onPunchOutClick={handlePunchOutClick}
             />
@@ -86,24 +82,36 @@ function CatalogoPage() {
             />
 
             <FilterBar
-                totalProducts={filteredProducts.length}
+                totalProducts={totalProducts}
                 sortOptions={sortOptions}
                 selectedSort={selectedSort}
-                onSortChange={handleSortChange}
+                onSortChange={onSortChange}
             />
 
             <main className="catalogo-content">
-                <ProductGrid
-                    products={filteredProducts}
-                    onAddToCart={handleAddToCart}
-                    onProductDetails={handleProductDetails}
-                />
+                {isLoading && (
+                    <div className="loading">Carregando produtos...</div>
+                )}
 
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={6}
-                    onPageChange={handlePageChange}
-                />
+                {error && (
+                    <div className="error">{error}</div>
+                )}
+
+                {!isLoading && !error && (
+                    <>
+                        <ProductGrid
+                            products={products}
+                            onAddToCart={handleAddToCart}
+                            onProductDetails={handleProductDetails}
+                        />
+
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </>
+                )}
             </main>
         </div>
     );

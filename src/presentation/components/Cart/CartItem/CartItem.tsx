@@ -1,17 +1,9 @@
 import './CartItem.css';
 import { FiMinus, FiPlus, FiTrash2 } from 'react-icons/fi';
-
-export interface CartProduct {
-    id: number;
-    category: string;
-    name: string;
-    price: number;
-    quantity: number;
-    imageUrl?: string;
-}
+import type { CartItem as CartItemType } from '../../../../domain/entities/Cart';
 
 interface CartItemProps {
-    item: CartProduct;
+    item: CartItemType;
     onQuantityChange: (id: number, quantity: number) => void;
     onRemove: (id: number) => void;
 }
@@ -31,36 +23,55 @@ function CartItem({ item, onQuantityChange, onRemove }: CartItemProps) {
     };
 
     const handleIncrease = () => {
-        onQuantityChange(item.id, item.quantity + 1);
+        // Don't exceed stock
+        if (item.stock && item.quantity < item.stock) {
+            onQuantityChange(item.id, item.quantity + 1);
+        } else if (!item.stock) {
+            onQuantityChange(item.id, item.quantity + 1);
+        }
     };
+
+    // Build subtitle from color and size
+    const subtitle = [
+        item.color ? `Cor: ${item.color}` : null,
+        item.size ? `Tam: ${item.size}` : null,
+    ].filter(Boolean).join(' | ');
 
     return (
         <div className="cart-item">
             <div className="item-image">
-                {item.imageUrl ? (
-                    <img src={item.imageUrl} alt={item.name} />
-                ) : (
-                    <div className="image-placeholder"></div>
-                )}
+                <div className="image-placeholder"></div>
             </div>
 
             <div className="item-details">
-                <span className="item-category">{item.category}</span>
+                {subtitle && <span className="item-category">{subtitle}</span>}
                 <h3 className="item-name">{item.name}</h3>
+                {item.stock !== undefined && (
+                    <span className="item-stock">{item.stock} disponíveis</span>
+                )}
             </div>
 
             <div className="item-quantity">
-                <button className="qty-btn" onClick={handleDecrease}>
+                <button
+                    className="qty-btn"
+                    onClick={handleDecrease}
+                    disabled={item.quantity <= 1}
+                >
                     <FiMinus />
                 </button>
                 <span className="qty-value">{item.quantity}</span>
-                <button className="qty-btn" onClick={handleIncrease}>
+                <button
+                    className="qty-btn"
+                    onClick={handleIncrease}
+                    disabled={item.stock !== undefined && item.quantity >= item.stock}
+                >
                     <FiPlus />
                 </button>
             </div>
 
             <div className="item-price">
-                {formatPrice(item.price * item.quantity)}
+                <span className="unit-price">{formatPrice(item.price)} / un.</span>
+                <span className="total-price">{formatPrice(item.price * item.quantity)}</span>
             </div>
 
             <button className="remove-btn" onClick={() => onRemove(item.id)}>

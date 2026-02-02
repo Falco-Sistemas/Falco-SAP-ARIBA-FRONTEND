@@ -8,6 +8,11 @@ interface PaginationProps {
 }
 
 function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+    // Don't show pagination if only 1 page or less
+    if (totalPages <= 1) {
+        return null;
+    }
+
     const getPageNumbers = (): (number | string)[] => {
         const pages: (number | string)[] = [];
 

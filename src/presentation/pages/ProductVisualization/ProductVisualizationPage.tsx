@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './ProductVisualizationPage.css';
 import { FiLogOut } from 'react-icons/fi';
@@ -6,60 +7,65 @@ import VisualizationHeader from '../../components/ProductVisualization/Visualiza
 import VisualizationNavigation from '../../components/ProductVisualization/VisualizationNavigation/VisualizationNavigation';
 import ProductImageGallery from '../../components/ProductVisualization/ProductImageGallery/ProductImageGallery';
 import ProductInfo from '../../components/ProductVisualization/ProductInfo/ProductInfo';
+import type { Product } from '../../../domain/entities/Product';
+import { ProductRepositoryImpl } from '../../../infrastructure/repositories/ProductRepositoryImpl';
+import { useCart } from '../../contexts/CartContext';
 
-// Mock data - in real app this comes from API based on product ID
-const mockProducts: Record<string, {
-    id: number;
-    name: string;
-    subtitle: string;
-    description: string;
-    price: number;
-    images: string[];
-}> = {
-    '1': {
-        id: 1,
-        name: 'Botina Amarrar N° 41',
-        subtitle: 'Calçado de Segurança',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-        price: 41.00,
-        images: [
-            '/src/assets/images/WhiteLabelImage.jpg',
-            '/src/assets/images/WhiteLabelImage.jpg',
-            '/src/assets/images/WhiteLabelImage.jpg',
-        ]
-    },
-    '2': {
-        id: 2,
-        name: 'Botina Amarrar N° 42',
-        subtitle: 'Calçado de Segurança',
-        description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-        price: 42.00,
-        images: [
-            '/src/assets/images/WhiteLabelImage.jpg',
-            '/src/assets/images/WhiteLabelImage.jpg',
-        ]
-    }
-};
+// Create repository instance
+const productRepository = new ProductRepositoryImpl();
 
-// Default product for when ID not found
-const defaultProduct = {
+// Default product for when ID not found or loading
+const defaultProduct: Product = {
     id: 0,
     name: 'Produto não encontrado',
-    subtitle: '',
     description: 'Este produto não existe.',
     price: 0,
-    images: ['/src/assets/images/WhiteLabelImage.jpg']
+    category: '',
+    imageUrl: '/src/assets/images/WhiteLabelImage.jpg',
+    stock: 0,
+    color: '',
+    size: '',
 };
 
 function ProductVisualizationPage() {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
 
-    // Get product by ID or use default
-    const product = id && mockProducts[id] ? mockProducts[id] : defaultProduct;
+    // Use cart context
+    const { totalItems, addToCart } = useCart();
+
+    // State for product data
+    const [product, setProduct] = useState<Product | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // Fetch product from backend
+    useEffect(() => {
+        async function fetchProduct() {
+            if (!id) {
+                setIsLoading(false);
+                return;
+            }
+
+            setIsLoading(true);
+            setError(null);
+
+            try {
+                const productData = await productRepository.getProductById(Number(id));
+                setProduct(productData);
+            } catch (err) {
+                setError('Erro ao carregar produto.');
+                console.error('Error fetching product:', err);
+            } finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchProduct();
+    }, [id]);
 
     const handleSearch = (query: string) => {
-        console.log('Searching:', query);
+        navigate(`/?search=${encodeURIComponent(query)}`);
     };
 
     const handleCartClick = () => {
@@ -67,21 +73,53 @@ function ProductVisualizationPage() {
     };
 
     const handleAddToCart = (quantity: number) => {
-        console.log('Added to cart:', product.name, 'Quantity:', quantity);
+        if (product) {
+            // Convert Product to CatalogProduct for cart
+            addToCart({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                imageUrl: product.imageUrl,
+                color: product.color,
+                size: product.size,
+                stock: product.stock,
+            }, quantity);
+            console.log('Added to cart:', product.name, 'Quantity:', quantity);
+        }
     };
 
     const handleBack = () => {
         navigate('/');
     };
 
+    // Build subtitle from color and size
+    const buildSubtitle = () => {
+        const parts = [];
+        if (product?.color) parts.push(`Cor: ${product.color}`);
+        if (product?.size) parts.push(`Tamanho: ${product.size}`);
+        return parts.join(' | ') || 'Produto';
+    };
+
+    // Build description
+    const buildDescription = () => {
+        if (product?.description && product.description !== product.name) {
+            return product.description;
+        }
+        return `Estoque disponível: ${product?.stock || 0} unidades`;
+    };
+
+    // Display data
+    const displayProduct = product || defaultProduct;
+    const images = ['/src/assets/images/WhiteLabelImage.jpg'];
+
     return (
         <div className="product-visualization-page">
             <VisualizationHeader
                 title="Catálogo de Produtos"
-                subtitle="220 Produtos no total"
-                userName="User_IDh"
+                subtitle="Detalhes do Produto"
+                userName="User_ID"
                 language="Português"
-                cartItemCount={0}
+                cartItemCount={totalItems}
                 onCartClick={handleCartClick}
             />
 
@@ -91,28 +129,38 @@ function ProductVisualizationPage() {
             />
 
             <main className="visualization-content">
-                <div className="product-detail-container">
-                    <div className="product-gallery-section">
-                        <ProductImageGallery
-                            images={product.images}
-                            productName={product.name}
-                        />
-                    </div>
+                {isLoading && (
+                    <div className="loading">Carregando produto...</div>
+                )}
 
-                    <div className="product-info-section">
-                        <button className="back-btn" onClick={handleBack}>
-                            <FiLogOut />
-                        </button>
+                {error && (
+                    <div className="error">{error}</div>
+                )}
 
-                        <ProductInfo
-                            name={product.name}
-                            subtitle={product.subtitle}
-                            description={product.description}
-                            price={product.price}
-                            onAddToCart={handleAddToCart}
-                        />
+                {!isLoading && !error && (
+                    <div className="product-detail-container">
+                        <div className="product-gallery-section">
+                            <ProductImageGallery
+                                images={images}
+                                productName={displayProduct.name}
+                            />
+                        </div>
+
+                        <div className="product-info-section">
+                            <button className="back-btn" onClick={handleBack}>
+                                <FiLogOut />
+                            </button>
+
+                            <ProductInfo
+                                name={displayProduct.name}
+                                subtitle={buildSubtitle()}
+                                description={buildDescription()}
+                                price={displayProduct.price}
+                                onAddToCart={handleAddToCart}
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
             </main>
         </div>
     );

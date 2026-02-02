@@ -105,3 +105,39 @@
 .remove-btn:hover {
     color: #e53935;
 }
+
+/* Stock info */
+.item-stock {
+    font-size: 0.75rem;
+    color: #22c55e;
+}
+
+/* Price display */
+.item-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+}
+
+.unit-price {
+    font-size: 0.75rem;
+    color: #888;
+    font-weight: 400;
+}
+
+.total-price {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Disabled buttons */
+.qty-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.qty-btn:hover:not(:disabled) {
+    color: #333;
+}

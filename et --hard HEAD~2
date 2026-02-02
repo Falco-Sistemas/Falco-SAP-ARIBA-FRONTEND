@@ -1,0 +1,35 @@
+[33mcommit 840d38ebb8c62b52625102655deb7804fb6f3327[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: User-Business <usercaio.business@gmai.com>
+Date:   Mon Feb 2 17:32:23 2026 -0300
+
+    fix: fix
+
+[33mcommit ad8e3fc4f61452e52c1ea74b232b7ece11934e1b[m
+Author: User-Business <usercaio.business@gmai.com>
+Date:   Mon Feb 2 17:30:08 2026 -0300
+
+    feat: add logic for domain and infraestructure for called endpoint
+
+[33mcommit 15186e10925a7d740f6812f4aafae672d9600cf6[m
+Author: User-Business <usercaio.business@gmai.com>
+Date:   Mon Jan 19 16:49:29 2026 -0300
+
+    feat: add the screen of visualization and the shopping cart
+
+[33mcommit e2be1102d3f3af78c36d985a435d6cc3dd14a49e[m
+Author: User-Business <usercaio.business@gmai.com>
+Date:   Mon Jan 19 15:44:25 2026 -0300
+
+    feat: add page of catalog
+
+[33mcommit 4f0a60dd97bae7d491756bf2056bae4cd225a5ad[m
+Author: User-Business <usercaio.business@gmai.com>
+Date:   Mon Jan 5 12:02:48 2026 -0300
+
+    feat: Criado estrutura geral de arquitetura e componentes para a tela de login
+
+[33mcommit 272cd4dd9973187bf63f89c1661661b8b474bf09[m[33m ([m[1;32mmaster[m[33m)[m
+Author: User-Business <usercaio.business@gmail.com>
+Date:   Mon Dec 22 15:34:36 2025 -0300
+
+    Initial commit
