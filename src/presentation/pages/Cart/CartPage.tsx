@@ -6,6 +6,8 @@ import CartNavigation from '../../components/Cart/CartNavigation/CartNavigation'
 import CartItem from '../../components/Cart/CartItem/CartItem';
 import CartSummary from '../../components/Cart/CartSummary/CartSummary';
 import { useCart } from '../../contexts/CartContext';
+import { useSession } from '../../contexts/SessionContext';
+import { buildPunchOutOrderMessage, submitPunchOutOrder } from '../../../infrastructure/punchout/buildPunchOutOrderMessage';
 
 const tabs = [
     { id: 'cart', label: 'Carrinho de Compras' },
@@ -17,8 +19,9 @@ function CartPage() {
     const [activeTab, setActiveTab] = useState('cart');
     const [searchQuery, setSearchQuery] = useState('');
 
-    // Use cart context
+    // Use cart and session contexts
     const { items, totalItems, updateQuantity, removeFromCart, clearCart } = useCart();
+    const { sessionId, postUrl } = useSession();
 
     const handleTabChange = (tabId: string) => {
         setActiveTab(tabId);
@@ -44,9 +47,28 @@ function CartPage() {
     };
 
     const handlePunchOut = () => {
-        console.log('PunchOut clicked - sending cart to SAP Ariba');
-        console.log('Cart items:', items);
-        alert('Carrinho enviado para SAP Ariba!');
+        if (!sessionId) {
+            alert('Sessão não encontrada. Verifique a URL.');
+            return;
+        }
+
+        if (!postUrl) {
+            alert('URL de retorno do Ariba não encontrada.');
+            return;
+        }
+
+        const xml = buildPunchOutOrderMessage({
+            buyerCookie: sessionId,
+            items,
+        });
+
+        console.log('PunchOut XML:', xml);
+
+        if (!confirm('Enviar pedido para SAP Ariba?\n\nVerifique o XML no Console (F12) antes de confirmar.')) {
+            return;
+        }
+
+        submitPunchOutOrder(postUrl, xml);
         clearCart();
     };
 

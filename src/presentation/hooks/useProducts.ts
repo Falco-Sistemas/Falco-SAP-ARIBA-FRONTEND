@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import type { CatalogProduct } from '../../domain/entities/Product';
 import { ProductRepositoryImpl } from '../../infrastructure/repositories/ProductRepositoryImpl';
+import { useSession } from '../contexts/SessionContext';
 
 interface UseProductsReturn {
     products: CatalogProduct[];
@@ -15,6 +16,8 @@ interface UseProductsReturn {
 }
 
 export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
+    const { sessionId } = useSession();
+
     const [products, setProducts] = useState<CatalogProduct[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
@@ -24,7 +27,10 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('price_desc');
 
-    const repository = new ProductRepositoryImpl();
+    const repository = useMemo(
+        () => new ProductRepositoryImpl(sessionId || '1'),
+        [sessionId]
+    );
 
     const fetchProducts = useCallback(async () => {
         setIsLoading(true);
@@ -47,7 +53,7 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
         } finally {
             setIsLoading(false);
         }
-    }, [currentPage, itemsPerPage, searchQuery, sortBy]);
+    }, [repository, currentPage, itemsPerPage, searchQuery, sortBy]);
 
     useEffect(() => {
         fetchProducts();

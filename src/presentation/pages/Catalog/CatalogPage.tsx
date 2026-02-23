@@ -39,7 +39,7 @@ function CatalogoPage() {
         handleSearch,
         handleSortChange,
         handlePageChange,
-    } = useProducts(8);
+    } = useProducts(10);
 
     const [selectedSort, setSelectedSort] = useState('Maior para Menor');
 

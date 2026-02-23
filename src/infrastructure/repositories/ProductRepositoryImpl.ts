@@ -7,22 +7,23 @@ import type { ProductRepository } from '../../application/ports/ProductRepositor
  */
 export class ProductRepositoryImpl implements ProductRepository {
     private baseUrl: string;
+    private sessionId: string;
 
-    constructor(baseUrl: string = 'http://localhost:3000') {
+    constructor(sessionId: string, baseUrl: string = 'http://localhost:3000') {
+        this.sessionId = sessionId;
         this.baseUrl = baseUrl;
     }
 
     /**
-     * Get paginated catalog products from API
+     * Get paginated catalog products from API (server-side pagination)
      */
     async getCatalogProducts(
         page: number,
         limit: number,
-        searchQuery?: string,
-        sortBy?: string
+        _searchQuery?: string,
+        _sortBy?: string
     ): Promise<PaginatedResponse<CatalogProduct>> {
-        // Your backend endpoint: /produtos?session=1
-        const url = `${this.baseUrl}/produtos?session=1`;
+        const url = `${this.baseUrl}/produtos?session=${this.sessionId}&page=${page}&pageSize=${limit}`;
 
         try {
             const response = await fetch(url);
@@ -33,8 +34,7 @@ export class ProductRepositoryImpl implements ProductRepository {
 
             const data = await response.json();
 
-            // Transform backend response (produtos) to frontend format
-            let products: CatalogProduct[] = data.produtos.map((p: any) => ({
+            const products: CatalogProduct[] = data.produtos.map((p: any) => ({
                 id: p.codigo,
                 name: p.descricao,
                 price: p.preco,
@@ -43,29 +43,11 @@ export class ProductRepositoryImpl implements ProductRepository {
                 stock: p.saldo,
             }));
 
-            // Frontend search filter
-            if (searchQuery) {
-                products = products.filter(p =>
-                    p.name.toLowerCase().includes(searchQuery.toLowerCase())
-                );
-            }
-
-            // Frontend sorting
-            if (sortBy) {
-                products = this.sortProducts(products, sortBy);
-            }
-
-            // Frontend pagination
-            const totalItems = products.length;
-            const totalPages = Math.ceil(totalItems / limit);
-            const startIndex = (page - 1) * limit;
-            const paginatedProducts = products.slice(startIndex, startIndex + limit);
-
             return {
-                data: paginatedProducts,
-                currentPage: page,
-                totalPages: totalPages,
-                totalItems: totalItems,
+                data: products,
+                currentPage: data.pagination.page,
+                totalPages: data.pagination.totalPages,
+                totalItems: data.pagination.total,
             };
         } catch (error) {
             console.error('Error fetching catalog products:', error);
@@ -74,31 +56,11 @@ export class ProductRepositoryImpl implements ProductRepository {
     }
 
     /**
-     * Sort products by field
-     */
-    private sortProducts(products: CatalogProduct[], sortBy: string): CatalogProduct[] {
-        const sorted = [...products];
-
-        switch (sortBy) {
-            case 'price_asc':
-                return sorted.sort((a, b) => a.price - b.price);
-            case 'price_desc':
-                return sorted.sort((a, b) => b.price - a.price);
-            case 'name_asc':
-                return sorted.sort((a, b) => a.name.localeCompare(b.name));
-            case 'name_desc':
-                return sorted.sort((a, b) => b.name.localeCompare(a.name));
-            default:
-                return sorted;
-        }
-    }
-
-    /**
      * Get single product by ID
      */
     async getProductById(id: number): Promise<Product | null> {
         // Get all products and find by ID
-        const url = `${this.baseUrl}/produtos?session=1`;
+        const url = `${this.baseUrl}/produtos?session=${this.sessionId}`;
 
         try {
             const response = await fetch(url);

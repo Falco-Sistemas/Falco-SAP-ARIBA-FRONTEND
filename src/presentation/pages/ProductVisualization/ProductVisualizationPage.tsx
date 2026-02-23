@@ -10,9 +10,7 @@ import ProductInfo from '../../components/ProductVisualization/ProductInfo/Produ
 import type { Product } from '../../../domain/entities/Product';
 import { ProductRepositoryImpl } from '../../../infrastructure/repositories/ProductRepositoryImpl';
 import { useCart } from '../../contexts/CartContext';
-
-// Create repository instance
-const productRepository = new ProductRepositoryImpl();
+import { useSession } from '../../contexts/SessionContext';
 
 // Default product for when ID not found or loading
 const defaultProduct: Product = {
@@ -31,8 +29,9 @@ function ProductVisualizationPage() {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
 
-    // Use cart context
+    // Use cart and session contexts
     const { totalItems, addToCart } = useCart();
+    const { sessionId } = useSession();
 
     // State for product data
     const [product, setProduct] = useState<Product | null>(null);
@@ -51,6 +50,7 @@ function ProductVisualizationPage() {
             setError(null);
 
             try {
+                const productRepository = new ProductRepositoryImpl(sessionId || '1');
                 const productData = await productRepository.getProductById(Number(id));
                 setProduct(productData);
             } catch (err) {
