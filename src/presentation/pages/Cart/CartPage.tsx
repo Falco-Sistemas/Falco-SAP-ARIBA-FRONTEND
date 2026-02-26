@@ -46,30 +46,38 @@ function CartPage() {
         // Already on cart page
     };
 
-    const handlePunchOut = () => {
+    const handlePunchOut = async () => {
         if (!sessionId) {
             alert('Sessão não encontrada. Verifique a URL.');
             return;
         }
 
-        if (!postUrl) {
-            alert('URL de retorno do Ariba não encontrada.');
-            return;
+        // Fetch extra session info from API
+        const url = `http://localhost:3000/session/${sessionId}`
+        const response = await fetch(url)
+        if(response.ok){
+            const data = await response.json()
+            const buyerIdentity = String(data.buyerIdentity_vc)
+            const supplierIdentity = String(data.parceiroAribaIdentity_vc)
+            const postUrl = String(data.punchoutUrl_vc)
+            
+            const xml = buildPunchOutOrderMessage({
+                buyerCookie: sessionId,
+                items,
+                buyerIdentity,
+                supplierIdentity
+            });
+    
+            console.log('PunchOut XML:', xml);
+    
+            if (!confirm('Enviar pedido para SAP Ariba?\n\nVerifique o XML no Console (F12) antes de confirmar.')) {
+                return;
+            }
+    
+            submitPunchOutOrder(postUrl, xml);
+            clearCart();
         }
 
-        const xml = buildPunchOutOrderMessage({
-            buyerCookie: sessionId,
-            items,
-        });
-
-        console.log('PunchOut XML:', xml);
-
-        if (!confirm('Enviar pedido para SAP Ariba?\n\nVerifique o XML no Console (F12) antes de confirmar.')) {
-            return;
-        }
-
-        submitPunchOutOrder(postUrl, xml);
-        clearCart();
     };
 
     // Filter items by search
