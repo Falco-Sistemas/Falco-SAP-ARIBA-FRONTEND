@@ -20,10 +20,18 @@ export class ProductRepositoryImpl implements ProductRepository {
     async getCatalogProducts(
         page: number,
         limit: number,
-        _searchQuery?: string,
-        _sortBy?: string
+        searchQuery?: string,
+        sortBy?: string
     ): Promise<PaginatedResponse<CatalogProduct>> {
-        const url = `${this.baseUrl}/produtos?session=${this.sessionId}&page=${page}&pageSize=${limit}`;
+        let url = `${this.baseUrl}/produtos?session=${this.sessionId}&page=${page}&pageSize=${limit}`;
+
+        if (searchQuery) {
+            url += `&search=${encodeURIComponent(searchQuery)}`;
+        }
+
+        if (sortBy) {
+            url += `&sort=${encodeURIComponent(sortBy)}`;
+        }
 
         try {
             const response = await fetch(url);
