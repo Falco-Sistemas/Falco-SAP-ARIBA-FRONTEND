@@ -80,20 +80,36 @@ function escapeXml(str: string): string {
         .replace(/'/g, '&apos;');
 }
 
-export function submitPunchOutOrder(postUrl: string, xml: string): void {
-    const encoded = btoa(unescape(encodeURIComponent(xml)));
+export function submitPunchOutOrder(postUrl: string, xml: string): Promise<void> {
+    return new Promise((resolve) => {
+        const encoded = btoa(unescape(encodeURIComponent(xml)));
 
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = postUrl;
-    form.style.display = 'none';
+        const iframeName = `punchout-iframe-${Date.now()}`;
+        const iframe = document.createElement('iframe');
+        iframe.name = iframeName;
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
 
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'cxml-base64';
-    input.value = encoded;
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = postUrl;
+        form.target = iframeName;
+        form.style.display = 'none';
 
-    form.appendChild(input);
-    document.body.appendChild(form);
-    form.submit();
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'cxml-base64';
+        input.value = encoded;
+
+        form.appendChild(input);
+        document.body.appendChild(form);
+
+        iframe.addEventListener('load', () => {
+            document.body.removeChild(iframe);
+            document.body.removeChild(form);
+            resolve();
+        });
+
+        form.submit();
+    });
 }

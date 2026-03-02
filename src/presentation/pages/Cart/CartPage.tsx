@@ -46,7 +46,7 @@ function CartPage() {
         // Already on cart page
     };
 
-    const handlePunchOut = () => {
+    const handlePunchOut = async () => {
         if (!sessionId) {
             alert('Sessão não encontrada. Verifique a URL.');
             return;
@@ -68,8 +68,18 @@ function CartPage() {
             return;
         }
 
-        submitPunchOutOrder(postUrl, xml);
+        const orderTotalItems = totalItems;
+        const orderTotalPrice = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
+
+        await submitPunchOutOrder(postUrl, xml);
         clearCart();
+
+        navigate('/pedido-sucesso', {
+            state: {
+                totalItems: orderTotalItems,
+                totalPrice: orderTotalPrice,
+            },
+        });
     };
 
     // Filter items by search
