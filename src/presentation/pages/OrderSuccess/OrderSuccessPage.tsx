@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { FiCheckCircle } from 'react-icons/fi';
 import './OrderSuccessPage.css';
 
@@ -8,7 +8,6 @@ interface OrderState {
 }
 
 function OrderSuccessPage() {
-    const navigate = useNavigate();
     const location = useLocation();
     const state = location.state as OrderState | null;
 
@@ -45,12 +44,9 @@ function OrderSuccessPage() {
                     </div>
                 )}
 
-                <button
-                    className="back-catalog-btn"
-                    onClick={() => navigate('/')}
-                >
-                    Voltar ao Catálogo
-                </button>
+                <p className="close-message">
+                    Processo finalizado. Você já pode fechar esta janela.
+                </p>
             </div>
         </div>
     );

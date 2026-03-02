@@ -72,18 +72,8 @@
     color: #1a1a1a;
 }
 
-.back-catalog-btn {
-    background-color: #2563eb;
-    color: white;
-    border: none;
-    padding: 14px 32px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.back-catalog-btn:hover {
-    background-color: #1d4ed8;
+.close-message {
+    font-size: 14px;
+    color: #888;
+    margin-top: 8px;
 }

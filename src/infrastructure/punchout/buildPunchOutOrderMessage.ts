@@ -109,11 +109,19 @@ export function submitPunchOutOrder(postUrl: string, xml: string): Promise<void>
         form.appendChild(input);
         document.body.appendChild(form);
 
-        iframe.addEventListener('load', () => {
-            document.body.removeChild(iframe);
-            document.body.removeChild(form);
+        let resolved = false;
+        const cleanup = () => {
+            if (resolved) return;
+            resolved = true;
+            if (document.body.contains(iframe)) document.body.removeChild(iframe);
+            if (document.body.contains(form)) document.body.removeChild(form);
             resolve();
-        });
+        };
+
+        iframe.addEventListener('load', cleanup);
+
+        // O POST já foi enviado, não precisa esperar resposta do Ariba
+        setTimeout(cleanup, 2000);
 
         form.submit();
     });
