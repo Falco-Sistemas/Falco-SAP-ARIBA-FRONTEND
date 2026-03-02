@@ -21,7 +21,7 @@ function CartPage() {
 
     // Use cart and session contexts
     const { items, totalItems, updateQuantity, removeFromCart, clearCart } = useCart();
-    const { sessionId, postUrl } = useSession();
+    const { sessionId } = useSession();
 
     const handleTabChange = (tabId: string) => {
         setActiveTab(tabId);
@@ -52,14 +52,24 @@ function CartPage() {
             return;
         }
 
-        if (!postUrl) {
-            alert('URL de retorno do Ariba não encontrada.');
+        // Fetch extra session info from API
+        const url = `http://localhost:3000/session/${sessionId}`;
+        const response = await fetch(url);
+        if (!response.ok) {
+            alert('Erro ao buscar dados da sessão.');
             return;
         }
+
+        const data = await response.json();
+        const buyerIdentity = String(data.buyerIdentity_vc);
+        const supplierIdentity = String(data.parceiroAribaIdentity_vc);
+        const sessionPostUrl = String(data.punchoutUrl_vc);
 
         const xml = buildPunchOutOrderMessage({
             buyerCookie: sessionId,
             items,
+            buyerIdentity,
+            supplierIdentity,
         });
 
         console.log('PunchOut XML:', xml);
@@ -71,7 +81,7 @@ function CartPage() {
         const orderTotalItems = totalItems;
         const orderTotalPrice = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
 
-        await submitPunchOutOrder(postUrl, xml);
+        await submitPunchOutOrder(sessionPostUrl, xml);
         clearCart();
 
         navigate('/pedido-sucesso', {

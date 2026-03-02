@@ -4,12 +4,17 @@ interface PunchOutOrderParams {
     buyerCookie: string;
     items: CartItem[];
     currency?: string;
+    buyerIdentity: string;
+    supplierIdentity: string;
 }
 
 export function buildPunchOutOrderMessage({
     buyerCookie,
     items,
     currency = 'BRL',
+    buyerIdentity,
+    supplierIdentity
+
 }: PunchOutOrderParams): string {
     const timestamp = new Date().toISOString();
     const payloadID = `${Date.now()}@sap-ariba-punchout`;
@@ -43,19 +48,19 @@ export function buildPunchOutOrderMessage({
     <Header>
         <From>
             <Credential domain="NetworkID">
-                <Identity>AN01012345678</Identity>
+                <Identity>${supplierIdentity}</Identity>
             </Credential>
         </From>
         <To>
             <Credential domain="NetworkID">
-                <Identity>AN01000002792</Identity>
+                <Identity>${buyerIdentity}</Identity>
             </Credential>
         </To>
         <Sender>
             <Credential domain="NetworkID">
-                <Identity>AN01012345678</Identity>
+                <Identity>${supplierIdentity}</Identity>
             </Credential>
-            <UserAgent>SAP Ariba PunchOut Catalog</UserAgent>
+            <UserAgent>Falco PunchOut Catalog</UserAgent>
         </Sender>
     </Header>
     <Message>
