@@ -23,6 +23,7 @@ const defaultProduct: Product = {
     stock: 0,
     color: '',
     size: '',
+    images: ['/src/assets/images/WhiteLabelImage.jpg']
 };
 
 function ProductVisualizationPage() {
@@ -110,7 +111,8 @@ function ProductVisualizationPage() {
 
     // Display data
     const displayProduct = product || defaultProduct;
-    const images = ['/src/assets/images/WhiteLabelImage.jpg'];
+
+    const images = displayProduct.images
 
     return (
         <div className="product-visualization-page">

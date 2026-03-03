@@ -49,6 +49,7 @@ export class ProductRepositoryImpl implements ProductRepository {
                 color: p.cor,
                 size: p.tamanho,
                 stock: p.saldo,
+                imageUrl: p.fotos[0] ? `${this.baseUrl}${p.fotos[0]}` : '/src/assets/images/WhiteLabelImage.jpg'
             }));
 
             return {
@@ -84,16 +85,20 @@ export class ProductRepositoryImpl implements ProductRepository {
                 return null;
             }
 
+            
+            const images = produto.fotos.length > 0 ? produto.fotos.map((foto: string) => `${this.baseUrl}${foto}`) : ['/src/assets/images/WhiteLabelImage.jpg']
+            
             return {
                 id: produto.codigo,
                 name: produto.descricao,
                 description: produto.descricao,
                 price: produto.preco,
                 category: '',
-                imageUrl: '/default-product.jpg',
+                imageUrl: images[0],
                 stock: produto.saldo,
                 color: produto.cor,
                 size: produto.tamanho,
+                images
             };
         } catch (error) {
             console.error('Error fetching product:', error);
