@@ -23,7 +23,8 @@ const defaultProduct: Product = {
     stock: 0,
     color: '',
     size: '',
-    images: ['/src/assets/images/WhiteLabelImage.jpg']
+    images: ['/src/assets/images/WhiteLabelImage.jpg'],
+    related: []
 };
 
 function ProductVisualizationPage() {
@@ -38,6 +39,10 @@ function ProductVisualizationPage() {
     const [product, setProduct] = useState<Product | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const handleChangeProduct = (id: number) => {
+        navigate(`/produto/${id}`)
+    }
 
     // Fetch product from backend
     useEffect(() => {
@@ -158,6 +163,8 @@ function ProductVisualizationPage() {
                                 subtitle={buildSubtitle()}
                                 description={buildDescription()}
                                 price={displayProduct.price}
+                                related={displayProduct.related}
+                                onRelatedPicked={handleChangeProduct}
                                 onAddToCart={handleAddToCart}
                             />
                         </div>

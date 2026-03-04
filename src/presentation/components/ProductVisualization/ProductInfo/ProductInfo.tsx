@@ -1,16 +1,19 @@
 import { useState } from 'react';
 import './ProductInfo.css';
 import { FiMinus, FiPlus } from 'react-icons/fi';
+import type { CatalogProduct } from '../../Catalog/ProductGrid/ProductCard/ProductCard';
 
 interface ProductInfoProps {
     name: string;
     subtitle: string;
     description: string;
     price: number;
+    related: CatalogProduct[]
+    onRelatedPicked: (productId: number) => void
     onAddToCart: (quantity: number) => void;
 }
 
-function ProductInfo({ name, subtitle, description, price, onAddToCart }: ProductInfoProps) {
+function ProductInfo({ name, subtitle, description, price, related, onRelatedPicked, onAddToCart }: ProductInfoProps) {
     const [quantity, setQuantity] = useState(1);
 
     const formatPrice = (value: number): string => {
@@ -42,6 +45,19 @@ function ProductInfo({ name, subtitle, description, price, onAddToCart }: Produc
             <div className="product-header">
                 <h1 className="product-title">{name}</h1>
                 <p className="product-subtitle">{subtitle}</p>
+            </div>
+
+            <div className='related-product-container'>
+                {related.map((rel) => (
+                    <div key={rel.id}>
+                        <button
+                        className='change-product-button'
+                        onClick={() => onRelatedPicked(rel.id)}
+                        >
+                            {rel.name}
+                        </button>
+                    </div>
+                ))}
             </div>
 
             <p className="product-description">{description}</p>

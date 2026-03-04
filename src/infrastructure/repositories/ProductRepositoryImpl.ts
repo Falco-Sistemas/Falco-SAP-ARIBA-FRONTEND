@@ -5,6 +5,24 @@ import type { ProductRepository } from '../../application/ports/ProductRepositor
  * Real implementation of ProductRepository
  * Makes actual HTTP calls to the backend API
  */
+
+
+interface ProductResponse{    
+    codigo: number
+    idParceiro: number
+    codigoNoParceiro: number
+    descricao: string
+    cor: string | undefined
+    tamanho: string | undefined
+    preco: number
+    saldo: number
+    fotos: string[]
+}
+
+interface ProductWithRelatedResponse extends ProductResponse{
+    relacionados: ProductResponse[]
+}
+
 export class ProductRepositoryImpl implements ProductRepository {
     private baseUrl: string;
     private sessionId: string;
@@ -68,8 +86,8 @@ export class ProductRepositoryImpl implements ProductRepository {
      * Get single product by ID
      */
     async getProductById(id: number): Promise<Product | null> {
-        // Get all products and find by ID
-        const url = `${this.baseUrl}/produtos?session=${this.sessionId}`;
+        // Get product by id from api using session
+        const url = `${this.baseUrl}/produtos/${id}?session=${this.sessionId}`;
 
         try {
             const response = await fetch(url);
@@ -78,15 +96,26 @@ export class ProductRepositoryImpl implements ProductRepository {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-            const data = await response.json();
-            const produto = data.produtos.find((p: any) => p.codigo === id);
-
+            const produto = await response.json() as ProductWithRelatedResponse;
             if (!produto) {
                 return null;
             }
 
             
             const images = produto.fotos.length > 0 ? produto.fotos.map((foto: string) => `${this.baseUrl}${foto}`) : ['/src/assets/images/WhiteLabelImage.jpg']
+            const relacionados: CatalogProduct[] = produto.relacionados.map(rel => {
+                const relFoto = produto.fotos.length > 0 ? `${this.baseUrl}${produto.fotos.at(0)}` : '/src/assets/images/WhiteLabelImage.jpg'
+
+                return {
+                    id: rel.codigo,
+                    name: rel.descricao,
+                    price: rel.preco,
+                    stock: rel.saldo,
+                    color: rel.cor,
+                    size: rel.tamanho,
+                    imageUrl: relFoto
+                }
+            })
             
             return {
                 id: produto.codigo,
@@ -98,7 +127,8 @@ export class ProductRepositoryImpl implements ProductRepository {
                 stock: produto.saldo,
                 color: produto.cor,
                 size: produto.tamanho,
-                images
+                images,
+                related: relacionados
             };
         } catch (error) {
             console.error('Error fetching product:', error);

@@ -128,3 +128,23 @@
 .add-to-cart-btn:hover {
     background-color: #1d4ed8;
 }
+
+.change-product-button{
+    background-color: white;
+    border: 1px solid black;
+    border-radius: 0.2rem;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.change-product-button:disabled{
+    opacity: 60%;
+}
+
+.related-product-container{
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
