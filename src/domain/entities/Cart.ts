@@ -9,6 +9,7 @@ export interface CartItem {
     color?: string;
     size?: string;
     stock: number;
+    imageUrl: string | undefined
 }
 
 /**

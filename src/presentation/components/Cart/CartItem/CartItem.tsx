@@ -40,7 +40,9 @@ function CartItem({ item, onQuantityChange, onRemove }: CartItemProps) {
     return (
         <div className="cart-item">
             <div className="item-image">
-                <div className="image-placeholder"></div>
+                <div className="image-placeholder">
+                    <img src={item.imageUrl} alt={item.name} />
+                </div>
             </div>
 
             <div className="item-details">

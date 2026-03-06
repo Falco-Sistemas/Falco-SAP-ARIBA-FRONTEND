@@ -40,6 +40,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 color: product.color,
                 size: product.size,
                 stock: product.stock,
+                imageUrl: product.imageUrl
             };
 
             return [...currentItems, newItem];
