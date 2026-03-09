@@ -7,7 +7,7 @@ import type { ProductRepository } from '../../application/ports/ProductRepositor
  */
 
 
-interface ProductResponse{    
+interface ProductResponse{
     codigo: number
     idParceiro: number
     codigoNoParceiro: number
@@ -17,6 +17,9 @@ interface ProductResponse{
     preco: number
     saldo: number
     fotos: string[]
+    familia?: string
+    grupo?: string
+    subgrupo?: string
 }
 
 interface ProductWithRelatedResponse extends ProductResponse{
@@ -67,7 +70,10 @@ export class ProductRepositoryImpl implements ProductRepository {
                 color: p.cor,
                 size: p.tamanho,
                 stock: p.saldo,
-                imageUrl: p.fotos[0] ? `${this.baseUrl}${p.fotos[0]}` : '/src/assets/images/WhiteLabelImage.jpg'
+                imageUrl: p.fotos[0] ? `${this.baseUrl}${p.fotos[0]}` : '/src/assets/images/WhiteLabelImage.jpg',
+                familia: p.familia,
+                grupo: p.grupo,
+                subgrupo: p.subgrupo,
             }));
 
             return {

@@ -28,6 +28,9 @@ export interface CatalogProduct {
     color?: string;
     size?: string;
     stock: number;
+    familia?: string;
+    grupo?: string;
+    subgrupo?: string;
 }
 
 /**

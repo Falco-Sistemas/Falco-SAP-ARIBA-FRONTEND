@@ -3,6 +3,12 @@ import type { CatalogProduct } from '../../domain/entities/Product';
 import { ProductRepositoryImpl } from '../../infrastructure/repositories/ProductRepositoryImpl';
 import { useSession } from '../contexts/SessionContext';
 
+export interface CategoryFilters {
+    familia: string;
+    grupo: string;
+    subgrupo: string;
+}
+
 interface UseProductsReturn {
     products: CatalogProduct[];
     currentPage: number;
@@ -13,6 +19,11 @@ interface UseProductsReturn {
     handleSearch: (query: string) => void;
     handleSortChange: (sortBy: string) => void;
     handlePageChange: (page: number) => void;
+    categoryFilters: CategoryFilters;
+    handleCategoryFilterChange: (filterName: keyof CategoryFilters, value: string) => void;
+    availableFamilias: string[];
+    availableGrupos: string[];
+    availableSubgrupos: string[];
 }
 
 function sortProducts(products: CatalogProduct[], sortBy: string): CatalogProduct[] {
@@ -46,6 +57,11 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('price_desc');
+    const [categoryFilters, setCategoryFilters] = useState<CategoryFilters>({
+        familia: '',
+        grupo: '',
+        subgrupo: '',
+    });
 
     const repository = useMemo(
         () => new ProductRepositoryImpl(sessionId || '1'),
@@ -71,10 +87,37 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
         fetchAllProducts();
     }, [fetchAllProducts]);
 
+    const availableFamilias = useMemo(() => {
+        const set = new Set<string>();
+        allProducts.forEach(p => { if (p.familia) set.add(p.familia); });
+        return Array.from(set).sort();
+    }, [allProducts]);
+
+    const availableGrupos = useMemo(() => {
+        const filtered = categoryFilters.familia
+            ? allProducts.filter(p => p.familia === categoryFilters.familia)
+            : allProducts;
+        const set = new Set<string>();
+        filtered.forEach(p => { if (p.grupo) set.add(p.grupo); });
+        return Array.from(set).sort();
+    }, [allProducts, categoryFilters.familia]);
+
+    const availableSubgrupos = useMemo(() => {
+        let filtered = allProducts;
+        if (categoryFilters.familia) filtered = filtered.filter(p => p.familia === categoryFilters.familia);
+        if (categoryFilters.grupo) filtered = filtered.filter(p => p.grupo === categoryFilters.grupo);
+        const set = new Set<string>();
+        filtered.forEach(p => { if (p.subgrupo) set.add(p.subgrupo); });
+        return Array.from(set).sort();
+    }, [allProducts, categoryFilters.familia, categoryFilters.grupo]);
+
     const filteredAndSorted = useMemo(() => {
-        const filtered = filterProducts(allProducts, searchQuery);
+        let filtered = filterProducts(allProducts, searchQuery);
+        if (categoryFilters.familia) filtered = filtered.filter(p => p.familia === categoryFilters.familia);
+        if (categoryFilters.grupo) filtered = filtered.filter(p => p.grupo === categoryFilters.grupo);
+        if (categoryFilters.subgrupo) filtered = filtered.filter(p => p.subgrupo === categoryFilters.subgrupo);
         return sortProducts(filtered, sortBy);
-    }, [allProducts, searchQuery, sortBy]);
+    }, [allProducts, searchQuery, sortBy, categoryFilters]);
 
     const totalItems = filteredAndSorted.length;
     const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
@@ -104,6 +147,20 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
         setCurrentPage(page);
     };
 
+    const handleCategoryFilterChange = (filterName: keyof CategoryFilters, value: string) => {
+        setCategoryFilters(prev => {
+            const updated = { ...prev, [filterName]: value };
+            if (filterName === 'familia') {
+                updated.grupo = '';
+                updated.subgrupo = '';
+            } else if (filterName === 'grupo') {
+                updated.subgrupo = '';
+            }
+            return updated;
+        });
+        setCurrentPage(1);
+    };
+
     return {
         products,
         currentPage,
@@ -114,5 +171,10 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
         handleSearch,
         handleSortChange,
         handlePageChange,
+        categoryFilters,
+        handleCategoryFilterChange,
+        availableFamilias,
+        availableGrupos,
+        availableSubgrupos,
     };
 }

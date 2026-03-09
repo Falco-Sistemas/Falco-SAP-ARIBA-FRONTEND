@@ -39,6 +39,11 @@ function CatalogoPage() {
         handleSearch,
         handleSortChange,
         handlePageChange,
+        categoryFilters,
+        handleCategoryFilterChange,
+        availableFamilias,
+        availableGrupos,
+        availableSubgrupos,
     } = useProducts(10);
 
     const [selectedSort, setSelectedSort] = useState('Maior para Menor');
@@ -86,6 +91,11 @@ function CatalogoPage() {
                 sortOptions={sortOptions}
                 selectedSort={selectedSort}
                 onSortChange={onSortChange}
+                categoryFilters={categoryFilters}
+                onCategoryFilterChange={handleCategoryFilterChange}
+                availableFamilias={availableFamilias}
+                availableGrupos={availableGrupos}
+                availableSubgrupos={availableSubgrupos}
             />
 
             <main className="catalogo-content">
