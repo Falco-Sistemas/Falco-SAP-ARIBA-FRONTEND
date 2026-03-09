@@ -15,7 +15,7 @@ function FilterBar ({totalProducts, sortOptions, selectedSort, onSortChange}: Fi
             </span>
 
             <div className="sort-container">
-                <label className="sort-label">Agrupar por:</label>
+                <label className="sort-label">Filtrar por:</label>
                 <select 
                     className="sort-select"
                     value={selectedSort}

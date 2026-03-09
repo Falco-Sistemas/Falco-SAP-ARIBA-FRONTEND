@@ -36,16 +36,18 @@
     top: 0;
     right: 0;
     background: none;
-    border: none;
-    font-size: 1.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
     cursor: pointer;
     color: #666;
-    padding: 0.5rem;
-    transition: color 0.2s;
+    padding: 0.4rem 0.8rem;
+    transition: color 0.2s, border-color 0.2s;
 }
 
 .back-btn:hover {
     color: #333;
+    border-color: #999;
 }
 
 /* Responsive */

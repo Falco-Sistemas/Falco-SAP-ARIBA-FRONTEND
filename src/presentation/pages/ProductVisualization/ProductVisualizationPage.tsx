@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './ProductVisualizationPage.css';
-import { FiLogOut } from 'react-icons/fi';
 
 import VisualizationHeader from '../../components/ProductVisualization/VisualizationHeader/VisualizationHeader';
 import VisualizationNavigation from '../../components/ProductVisualization/VisualizationNavigation/VisualizationNavigation';
@@ -155,7 +154,7 @@ function ProductVisualizationPage() {
 
                         <div className="product-info-section">
                             <button className="back-btn" onClick={handleBack}>
-                                <FiLogOut />
+                                Voltar ao catálogo
                             </button>
 
                             <ProductInfo

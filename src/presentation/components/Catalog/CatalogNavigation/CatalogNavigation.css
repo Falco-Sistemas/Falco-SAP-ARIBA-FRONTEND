@@ -1,15 +1,18 @@
 .catalog-navigation {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     background-color: #2563eb;
     padding: 0.8rem 2rem;
+    position: relative;
 }
 
 .catalog-title-container {
     display: flex;
     align-items: center;
     gap: 1rem;
+    position: absolute;
+    left: 2rem;
 }
 
 .catalog-title {
