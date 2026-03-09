@@ -2,10 +2,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #2563eb;
+    background-color: #002e4a;
     padding: 0.8rem 2rem;
     position: relative;
+    overflow: hidden;
 }
+
 
 .catalog-title-container {
     display: flex;
@@ -13,6 +15,12 @@
     gap: 1rem;
     position: absolute;
     left: 2rem;
+    z-index: 1;
+}
+
+.catalog-logo {
+    height: 36px;
+    width: auto;
 }
 
 .catalog-title {
@@ -37,6 +45,7 @@
     max-width: 700px;
     margin: 0 auto;
     height: 40px;
+    z-index: 1;
 }
 
 .search-box {
@@ -80,4 +89,29 @@
 .search-icon {
     font-size: 1.3rem;
     color: #333;
+}
+
+.catalog-cart-btn {
+    position: absolute;
+    right: 2rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: white;
+    cursor: pointer;
+    z-index: 1;
+}
+
+.catalog-cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #f3a847;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 0.15rem 0.4rem;
+    border-radius: 50%;
+    min-width: 18px;
+    text-align: center;
 }

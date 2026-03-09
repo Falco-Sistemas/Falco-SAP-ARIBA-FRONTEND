@@ -10,7 +10,7 @@
 
 .total-products {
     font-size: 0.95rem;
-    color: #555;
+    color: #002e4a;
 }
 
 .category-filters {
@@ -28,7 +28,7 @@
 
 .filter-label {
     font-size: 0.9rem;
-    color: #667;
+    color: #002e4a;
 }
 
 .filter-select {
@@ -53,7 +53,7 @@
 
 .sort-label {
     font-size: 0.9rem;
-    color: #667;
+    color: #002e4a;
     gap: 0.5rem;
 }
 

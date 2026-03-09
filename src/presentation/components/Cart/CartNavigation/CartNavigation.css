@@ -1,9 +1,15 @@
 .cart-navigation {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background-color: #2563eb;
+    background-color: #002e4a;
     padding: 0 1rem;
+    gap: 1rem;
+}
+
+.cart-nav-logo {
+    height: 36px;
+    width: auto;
+    margin-left: 1rem;
 }
 
 .tabs {
@@ -32,23 +38,24 @@
     font-weight: 600;
 }
 
-.search-box {
-    display: flex;
-    align-items: center;
-    background-color: white;
-    border-radius: 4px;
-    padding: 0.5rem 1rem;
-    margin: 0.5rem 0;
+.cart-nav-cart-btn {
+    margin-left: auto;
+    margin-right: 1rem;
+    font-size: 1.5rem;
+    color: white;
+    position: relative;
 }
 
-.search-box input {
-    border: none;
-    outline: none;
-    font-size: 0.9rem;
-    width: 150px;
-}
-
-.search-icon {
-    font-size: 1rem;
-    color: #888;
+.cart-nav-cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #f3a847;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 0.15rem 0.4rem;
+    border-radius: 50%;
+    min-width: 18px;
+    text-align: center;
 }

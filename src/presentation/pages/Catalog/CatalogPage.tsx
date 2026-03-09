@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CatalogPage.css';
 
-import CatalogHeader from '../../components/Catalog/CatalogHeader/CatalogHeader';
 import CatalogNavigation from '../../components/Catalog/CatalogNavigation/CatalogNavigation';
 import FilterBar from '../../components/Catalog/FilterBar/FilterBar';
 import ProductGrid from '../../components/Catalog/ProductGrid/ProductGrid';
@@ -61,10 +60,6 @@ function CatalogoPage() {
         navigate('/carrinho');
     };
 
-    const handlePunchOutClick = () => {
-        navigate('/carrinho');
-    };
-
     const onSortChange = (displaySort: string) => {
         setSelectedSort(displaySort);
         const apiSort = sortMapping[displaySort] || 'price_desc';
@@ -73,17 +68,11 @@ function CatalogoPage() {
 
     return (
         <div className="catalogo-page">
-            <CatalogHeader
-                userName="User_ID"
-                language="Português"
-                cartItemCount={totalItems}
-                onCartClick={handleCartClick}
-                onPunchOutClick={handlePunchOutClick}
-            />
-
             <CatalogNavigation
                 title="Catálogo de Produtos"
                 onSearch={handleSearch}
+                cartItemCount={totalItems}
+                onCartClick={handleCartClick}
             />
 
             <FilterBar

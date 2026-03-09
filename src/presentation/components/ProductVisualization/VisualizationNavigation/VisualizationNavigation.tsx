@@ -1,27 +1,26 @@
 import './VisualizationNavigation.css';
-import { FiSearch } from 'react-icons/fi';
+import { FaShoppingCart } from 'react-icons/fa';
+import logoImg from '../../../../assets/images/logo.png';
 
 interface VisualizationNavigationProps {
     title: string;
-    onSearch: (query: string) => void;
+    cartItemCount: number;
+    onCartClick: () => void;
 }
 
-function VisualizationNavigation({ title, onSearch }: VisualizationNavigationProps) {
+function VisualizationNavigation({ title, cartItemCount, onCartClick }: VisualizationNavigationProps) {
     return (
         <nav className="visualization-navigation">
             <div className="nav-title-container">
+                <img src={logoImg} alt="Logo" className="nav-logo" />
                 <h2 className="nav-title">{title}</h2>
-                <span className="vertical-divider"></span>
             </div>
-
-            <div className="search-box">
-                <input
-                    type="text"
-                    placeholder="Pesquisar..."
-                    onChange={(e) => onSearch(e.target.value)}
-                />
-                <FiSearch className="search-icon" />
-            </div>
+            <button className="vis-cart-btn" onClick={onCartClick}>
+                <FaShoppingCart />
+                {cartItemCount > 0 && (
+                    <span className="vis-cart-badge">{cartItemCount}</span>
+                )}
+            </button>
         </nav>
     );
 }

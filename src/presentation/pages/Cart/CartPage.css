@@ -55,7 +55,7 @@
 }
 
 .continue-shopping-btn {
-    background-color: #2563eb;
+    background-color: #002e4a;
     color: white;
     border: none;
     padding: 12px 24px;
@@ -67,5 +67,5 @@
 }
 
 .continue-shopping-btn:hover {
-    background-color: #1d4ed8;
+    background-color: #001f33;
 }

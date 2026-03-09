@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './ProductVisualizationPage.css';
 
-import VisualizationHeader from '../../components/ProductVisualization/VisualizationHeader/VisualizationHeader';
 import VisualizationNavigation from '../../components/ProductVisualization/VisualizationNavigation/VisualizationNavigation';
 import ProductImageGallery from '../../components/ProductVisualization/ProductImageGallery/ProductImageGallery';
 import ProductInfo from '../../components/ProductVisualization/ProductInfo/ProductInfo';
@@ -69,10 +68,6 @@ function ProductVisualizationPage() {
         fetchProduct();
     }, [id]);
 
-    const handleSearch = (query: string) => {
-        navigate(`/?search=${encodeURIComponent(query)}`);
-    };
-
     const handleCartClick = () => {
         navigate('/carrinho');
     };
@@ -120,18 +115,10 @@ function ProductVisualizationPage() {
 
     return (
         <div className="product-visualization-page">
-            <VisualizationHeader
-                title="Catálogo de Produtos"
-                subtitle="Detalhes do Produto"
-                userName="User_ID"
-                language="Português"
-                cartItemCount={totalItems}
-                onCartClick={handleCartClick}
-            />
-
             <VisualizationNavigation
                 title="Visualização do Produto"
-                onSearch={handleSearch}
+                cartItemCount={totalItems}
+                onCartClick={handleCartClick}
             />
 
             <main className="visualization-content">

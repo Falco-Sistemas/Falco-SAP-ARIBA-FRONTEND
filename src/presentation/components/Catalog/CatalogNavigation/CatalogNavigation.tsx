@@ -1,13 +1,17 @@
 import { useRef } from 'react';
 import './CatalogNavigation.css';
 import { FiSearch } from 'react-icons/fi';
+import { FaShoppingCart } from 'react-icons/fa';
+import logoImg from '../../../../assets/images/logo.png';
 
 interface CatalogNavigationProps {
     title: string;
     onSearch: (query: string) => void;
+    cartItemCount: number;
+    onCartClick: () => void;
 }
 
-function CatalogNavigation({title, onSearch}: CatalogNavigationProps) {
+function CatalogNavigation({title, onSearch, cartItemCount, onCartClick}: CatalogNavigationProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 
     const focusInput = () => {
@@ -17,6 +21,7 @@ function CatalogNavigation({title, onSearch}: CatalogNavigationProps) {
     return (
         <nav className="catalog-navigation">
             <div className="catalog-title-container">
+                <img src={logoImg} alt="Logo" className="catalog-logo" />
                 <h1 className="catalog-title">{title}</h1>
                 <span className="vertical-divider"></span>
             </div>
@@ -34,6 +39,13 @@ function CatalogNavigation({title, onSearch}: CatalogNavigationProps) {
                     <FiSearch className="search-icon" />
                 </span>
             </div>
+
+            <button className="catalog-cart-btn" onClick={onCartClick}>
+                <FaShoppingCart />
+                {cartItemCount > 0 && (
+                    <span className="catalog-cart-badge">{cartItemCount}</span>
+                )}
+            </button>
         </nav>
     );
 }

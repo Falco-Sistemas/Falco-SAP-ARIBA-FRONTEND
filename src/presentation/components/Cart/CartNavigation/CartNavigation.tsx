@@ -1,5 +1,6 @@
 import './CartNavigation.css';
-import { FiSearch } from 'react-icons/fi';
+import { FaShoppingCart } from 'react-icons/fa';
+import logoImg from '../../../../assets/images/logo.png';
 
 interface Tab {
     id: string;
@@ -10,12 +11,13 @@ interface CartNavigationProps {
     tabs: Tab[];
     activeTab: string;
     onTabChange: (tabId: string) => void;
-    onSearch: (query: string) => void;
+    cartItemCount: number;
 }
 
-function CartNavigation({ tabs, activeTab, onTabChange, onSearch }: CartNavigationProps) {
+function CartNavigation({ tabs, activeTab, onTabChange, cartItemCount }: CartNavigationProps) {
     return (
         <nav className="cart-navigation">
+            <img src={logoImg} alt="Logo" className="cart-nav-logo" />
             <div className="tabs">
                 {tabs.map((tab) => (
                     <button
@@ -27,14 +29,11 @@ function CartNavigation({ tabs, activeTab, onTabChange, onSearch }: CartNavigati
                     </button>
                 ))}
             </div>
-
-            <div className="search-box">
-                <input
-                    type="text"
-                    placeholder="Pesquisar..."
-                    onChange={(e) => onSearch(e.target.value)}
-                />
-                <FiSearch className="search-icon" />
+            <div className="cart-nav-cart-btn">
+                <FaShoppingCart />
+                {cartItemCount > 0 && (
+                    <span className="cart-nav-cart-badge">{cartItemCount}</span>
+                )}
             </div>
         </nav>
     );
