@@ -22,7 +22,10 @@ const defaultProduct: Product = {
     color: '',
     size: '',
     images: ['/src/assets/images/WhiteLabelImage.jpg'],
-    related: []
+    related: [],
+    family: {codigo: 0, descricao: ''},
+    group: {codigo: 0, descricao: ''},
+    subgroup: {codigo: 0, descricao: ''},
 };
 
 function ProductVisualizationPage() {
@@ -83,6 +86,9 @@ function ProductVisualizationPage() {
                 color: product.color,
                 size: product.size,
                 stock: product.stock,
+                family: product.family,
+                group: product.group,
+                subgroup: product.subgroup
             }, quantity);
             console.log('Added to cart:', product.name, 'Quantity:', quantity);
         }

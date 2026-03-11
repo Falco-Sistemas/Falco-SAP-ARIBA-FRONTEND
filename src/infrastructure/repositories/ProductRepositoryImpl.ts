@@ -1,5 +1,5 @@
-import type { CatalogProduct, PaginatedResponse, Product } from '../../domain/entities/Product';
-import type { ProductRepository } from '../../application/ports/ProductRepository';
+import type { CatalogProduct, Familia, Grupo, PaginatedResponse, Product, Subgrupo } from '../../domain/entities/Product';
+import type { ProductFilters, ProductRepository } from '../../application/ports/ProductRepository';
 
 /**
  * Real implementation of ProductRepository
@@ -7,7 +7,7 @@ import type { ProductRepository } from '../../application/ports/ProductRepositor
  */
 
 
-interface ProductResponse{
+interface ProductResponse {
     codigo: number
     idParceiro: number
     codigoNoParceiro: number
@@ -17,12 +17,12 @@ interface ProductResponse{
     preco: number
     saldo: number
     fotos: string[]
-    familia?: string
-    grupo?: string
-    subgrupo?: string
+    familia: Familia
+    grupo: Grupo
+    subgrupo: Subgrupo
 }
 
-interface ProductWithRelatedResponse extends ProductResponse{
+interface ProductWithRelatedResponse extends ProductResponse {
     relacionados: ProductResponse[]
 }
 
@@ -42,17 +42,27 @@ export class ProductRepositoryImpl implements ProductRepository {
         page: number,
         limit: number,
         searchQuery?: string,
-        sortBy?: string
+        sortBy?: string,
+        filters?: ProductFilters
     ): Promise<PaginatedResponse<CatalogProduct>> {
-        let url = `${this.baseUrl}/produtos?session=${this.sessionId}&page=${page}&pageSize=${limit}`;
+        const url = new URL(`${this.baseUrl}/produtos`)
+        const params = url.searchParams
+
+        params.set('session', this.sessionId)
+        params.set('page', String(page))
+        params.set('pageSize', String(limit))
 
         if (searchQuery) {
-            url += `&search=${encodeURIComponent(searchQuery)}`;
+            params.set('search', encodeURIComponent(searchQuery || ''))
         }
 
         if (sortBy) {
-            url += `&sort=${encodeURIComponent(sortBy)}`;
+            params.set('sort', encodeURIComponent(sortBy || ''))
         }
+
+        params.set('familia', String(filters?.familyId))
+        params.set('grupo', String(filters?.groupId))
+        params.set('subgrupo', String(filters?.subgroupId))
 
         try {
             const response = await fetch(url);
@@ -71,9 +81,9 @@ export class ProductRepositoryImpl implements ProductRepository {
                 size: p.tamanho,
                 stock: p.saldo,
                 imageUrl: p.fotos[0] ? `${this.baseUrl}${p.fotos[0]}` : '/src/assets/images/WhiteLabelImage.jpg',
-                familia: p.familia,
-                grupo: p.grupo,
-                subgrupo: p.subgrupo,
+                family: p.familia,
+                group: p.grupo,
+                subgroup: p.subgrupo
             }));
 
             return {
@@ -107,7 +117,7 @@ export class ProductRepositoryImpl implements ProductRepository {
                 return null;
             }
 
-            
+
             const images = produto.fotos.length > 0 ? produto.fotos.map((foto: string) => `${this.baseUrl}${foto}`) : ['/src/assets/images/WhiteLabelImage.jpg']
             const relacionados: CatalogProduct[] = produto.relacionados.map(rel => {
                 const relFoto = produto.fotos.length > 0 ? `${this.baseUrl}${produto.fotos.at(0)}` : '/src/assets/images/WhiteLabelImage.jpg'
@@ -119,10 +129,13 @@ export class ProductRepositoryImpl implements ProductRepository {
                     stock: rel.saldo,
                     color: rel.cor,
                     size: rel.tamanho,
-                    imageUrl: relFoto
+                    imageUrl: relFoto,
+                    family: rel.familia,
+                    group: rel.grupo,
+                    subgroup: rel.subgrupo
                 }
             })
-            
+
             return {
                 id: produto.codigo,
                 name: produto.descricao,
@@ -134,7 +147,10 @@ export class ProductRepositoryImpl implements ProductRepository {
                 color: produto.cor,
                 size: produto.tamanho,
                 images,
-                related: relacionados
+                related: relacionados,
+                family: produto.familia,
+                group: produto.grupo,
+                subgroup: produto.subgrupo
             };
         } catch (error) {
             console.error('Error fetching product:', error);

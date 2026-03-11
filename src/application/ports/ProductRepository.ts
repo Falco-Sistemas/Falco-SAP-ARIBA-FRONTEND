@@ -1,5 +1,11 @@
 import type { CatalogProduct, PaginatedResponse, Product } from "../../domain/entities/Product";
 
+export interface ProductFilters {
+    familyId?: number
+    groupId?: number
+    subgroupId?: number
+}
+
 /**
  * Port (interface) for Product Repository
  * Infraestructure layer MUST implement this interface
@@ -13,7 +19,8 @@ export interface ProductRepository {
         page: number,
         limit: number,
         searchQuery?: string,
-        sortBy?: string
+        sortBy?: string,
+        filters?: ProductFilters
     ): Promise<PaginatedResponse<CatalogProduct>>;
 
     /**

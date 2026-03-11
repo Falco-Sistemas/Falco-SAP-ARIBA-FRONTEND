@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import type { CatalogProduct } from '../../domain/entities/Product';
+import type { CatalogProduct, Familia, Grupo, Subgrupo } from '../../domain/entities/Product';
 import { ProductRepositoryImpl } from '../../infrastructure/repositories/ProductRepositoryImpl';
 import { useSession } from '../contexts/SessionContext';
+import { FamilyRepositoryImpl, type FamiliesResponse } from '../../infrastructure/repositories/FamilyRepositoryImpl';
 
 export interface CategoryFilters {
-    familia: string;
-    grupo: string;
-    subgrupo: string;
+    familia?: number;
+    grupo?: number;
+    subgrupo?: number;
 }
 
 interface UseProductsReturn {
@@ -21,9 +22,9 @@ interface UseProductsReturn {
     handlePageChange: (page: number) => void;
     categoryFilters: CategoryFilters;
     handleCategoryFilterChange: (filterName: keyof CategoryFilters, value: string) => void;
-    availableFamilias: string[];
-    availableGrupos: string[];
-    availableSubgrupos: string[];
+    availableFamilias: Familia[];
+    availableGrupos: Grupo[];
+    availableSubgrupos: Subgrupo[];
 }
 
 function sortProducts(products: CatalogProduct[], sortBy: string): CatalogProduct[] {
@@ -57,14 +58,16 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
     const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortBy, setSortBy] = useState('price_desc');
-    const [categoryFilters, setCategoryFilters] = useState<CategoryFilters>({
-        familia: '',
-        grupo: '',
-        subgrupo: '',
-    });
+    const [availableFamilias, setAvailableFamilias] = useState<FamiliesResponse[]>([])
+    const [categoryFilters, setCategoryFilters] = useState<CategoryFilters>({});
 
-    const repository = useMemo(
+    const productRepository = useMemo(
         () => new ProductRepositoryImpl(sessionId || '1'),
+        [sessionId]
+    );
+
+    const familyRepository = useMemo(
+        () => new FamilyRepositoryImpl(sessionId || '1'),
         [sessionId]
     );
 
@@ -73,7 +76,11 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
         setError(null);
 
         try {
-            const response = await repository.getCatalogProducts(1, 1000);
+            const response = await productRepository.getCatalogProducts(1, 1000, undefined, undefined, {
+                familyId: categoryFilters.familia,
+                groupId: categoryFilters.grupo,
+                subgroupId: categoryFilters.subgrupo
+            });
             setAllProducts(response.data);
         } catch (err) {
             setError('Erro ao carregar produtos. Tente novamente.');
@@ -81,41 +88,50 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
         } finally {
             setIsLoading(false);
         }
-    }, [repository]);
+    }, [productRepository, categoryFilters]);
+
+    const fetchAllFamilies = useCallback(async () => {
+        try {
+            const data = await familyRepository.getAllFamilies();
+            setAvailableFamilias(data);
+        } catch (err) {
+            setError('Erro ao carregar produtos. Tente novamente.');
+            console.error('Error fetching products:', err);
+        }
+    }, [familyRepository])
+
+    useEffect(() => {
+        fetchAllFamilies();
+    }, []);
 
     useEffect(() => {
         fetchAllProducts();
     }, [fetchAllProducts]);
 
-    const availableFamilias = useMemo(() => {
-        const set = new Set<string>();
-        allProducts.forEach(p => { if (p.familia) set.add(p.familia); });
-        return Array.from(set).sort();
-    }, [allProducts]);
-
     const availableGrupos = useMemo(() => {
-        const filtered = categoryFilters.familia
-            ? allProducts.filter(p => p.familia === categoryFilters.familia)
-            : allProducts;
-        const set = new Set<string>();
-        filtered.forEach(p => { if (p.grupo) set.add(p.grupo); });
-        return Array.from(set).sort();
-    }, [allProducts, categoryFilters.familia]);
+        if(categoryFilters.familia){
+            const familia = availableFamilias.find(f => Number(categoryFilters.familia) === f.codigo)
+            if(familia){
+                return familia.groups
+            }
+        }
+
+        return []
+    }, [availableFamilias, categoryFilters.familia])
 
     const availableSubgrupos = useMemo(() => {
-        let filtered = allProducts;
-        if (categoryFilters.familia) filtered = filtered.filter(p => p.familia === categoryFilters.familia);
-        if (categoryFilters.grupo) filtered = filtered.filter(p => p.grupo === categoryFilters.grupo);
-        const set = new Set<string>();
-        filtered.forEach(p => { if (p.subgrupo) set.add(p.subgrupo); });
-        return Array.from(set).sort();
-    }, [allProducts, categoryFilters.familia, categoryFilters.grupo]);
+        if(categoryFilters.grupo && availableGrupos){
+            const grupo = availableGrupos.find(g => Number(categoryFilters.grupo) === g.codigo)
+            if(grupo){
+                return grupo.subgroups
+            }
+        }
+
+        return []
+    }, [availableGrupos, categoryFilters.grupo])
 
     const filteredAndSorted = useMemo(() => {
         let filtered = filterProducts(allProducts, searchQuery);
-        if (categoryFilters.familia) filtered = filtered.filter(p => p.familia === categoryFilters.familia);
-        if (categoryFilters.grupo) filtered = filtered.filter(p => p.grupo === categoryFilters.grupo);
-        if (categoryFilters.subgrupo) filtered = filtered.filter(p => p.subgrupo === categoryFilters.subgrupo);
         return sortProducts(filtered, sortBy);
     }, [allProducts, searchQuery, sortBy, categoryFilters]);
 
@@ -151,16 +167,15 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
         setCategoryFilters(prev => {
             const updated = { ...prev, [filterName]: value };
             if (filterName === 'familia') {
-                updated.grupo = '';
-                updated.subgrupo = '';
+                updated.grupo = undefined;
+                updated.subgrupo = undefined;
             } else if (filterName === 'grupo') {
-                updated.subgrupo = '';
+                updated.subgrupo = undefined;
             }
             return updated;
         });
         setCurrentPage(1);
     };
-
     return {
         products,
         currentPage,

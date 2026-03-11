@@ -1,5 +1,6 @@
 import './FilterBar.css';
 import type { CategoryFilters } from '../../../hooks/useProducts';
+import type { Familia, Grupo, Subgrupo } from '../../../../domain/entities/Product';
 
 interface FilterBarProps {
     totalProducts: number;
@@ -8,9 +9,9 @@ interface FilterBarProps {
     onSortChange: (sort: string) => void;
     categoryFilters: CategoryFilters;
     onCategoryFilterChange: (filterName: keyof CategoryFilters, value: string) => void;
-    availableFamilias: string[];
-    availableGrupos: string[];
-    availableSubgrupos: string[];
+    availableFamilias: Familia[];
+    availableGrupos: Grupo[];
+    availableSubgrupos: Subgrupo[];
 }
 
 function FilterBar ({
@@ -38,9 +39,9 @@ function FilterBar ({
                         value={categoryFilters.familia}
                         onChange={(e) => onCategoryFilterChange('familia', e.target.value)}
                     >
-                        <option value="">Todas</option>
+                        <option value={undefined}>Todas</option>
                         {availableFamilias.map((f) => (
-                            <option key={f} value={f}>{f}</option>
+                            <option key={`family${f.codigo}`} value={f.codigo}>{f.descricao}</option>
                         ))}
                     </select>
                 </div>
@@ -52,9 +53,9 @@ function FilterBar ({
                         value={categoryFilters.grupo}
                         onChange={(e) => onCategoryFilterChange('grupo', e.target.value)}
                     >
-                        <option value="">Todos</option>
+                        <option value={undefined}>Todos</option>
                         {availableGrupos.map((g) => (
-                            <option key={g} value={g}>{g}</option>
+                            <option key={`group${g.codigo}`} value={g.codigo}>{g.descricao}</option>
                         ))}
                     </select>
                 </div>
@@ -66,9 +67,9 @@ function FilterBar ({
                         value={categoryFilters.subgrupo}
                         onChange={(e) => onCategoryFilterChange('subgrupo', e.target.value)}
                     >
-                        <option value="">Todos</option>
+                        <option value={undefined}>Todos</option>
                         {availableSubgrupos.map((s) => (
-                            <option key={s} value={s}>{s}</option>
+                            <option key={`subgroup${s.codigo}`} value={s.codigo}>{s.descricao}</option>
                         ))}
                     </select>
                 </div>
