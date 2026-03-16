@@ -28,7 +28,7 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    padding-right: 3rem;
+    padding-top: 2.5rem;
 }
 
 .back-btn {
