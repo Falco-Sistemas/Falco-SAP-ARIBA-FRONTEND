@@ -62,16 +62,18 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
     const [categoryFilters, setCategoryFilters] = useState<CategoryFilters>({});
 
     const productRepository = useMemo(
-        () => new ProductRepositoryImpl(sessionId || '1'),
+        () => sessionId ? new ProductRepositoryImpl(sessionId) : null,
         [sessionId]
     );
 
     const familyRepository = useMemo(
-        () => new FamilyRepositoryImpl(sessionId || '1'),
+        () => sessionId ? new FamilyRepositoryImpl(sessionId) : null,
         [sessionId]
     );
 
     const fetchAllProducts = useCallback(async () => {
+        if (!productRepository) return;
+
         setIsLoading(true);
         setError(null);
 
@@ -91,6 +93,8 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
     }, [productRepository, categoryFilters]);
 
     const fetchAllFamilies = useCallback(async () => {
+        if (!familyRepository) return;
+
         try {
             const data = await familyRepository.getAllFamilies();
             setAvailableFamilias(data);
@@ -102,7 +106,7 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
 
     useEffect(() => {
         fetchAllFamilies();
-    }, []);
+    }, [fetchAllFamilies]);
 
     useEffect(() => {
         fetchAllProducts();
