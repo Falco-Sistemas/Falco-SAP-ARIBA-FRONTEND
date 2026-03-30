@@ -30,7 +30,7 @@ export class ProductRepositoryImpl implements ProductRepository {
     private baseUrl: string;
     private sessionId: string;
 
-    constructor(sessionId: string, baseUrl: string = 'http://localhost:3000') {
+    constructor(sessionId: string, baseUrl: string = import.meta.env.VITE_API_URL ?? 'http://localhost:3000') {
         this.sessionId = sessionId;
         this.baseUrl = baseUrl;
     }
