@@ -1,4 +1,4 @@
-import type { Familia, Grupo, Subgrupo } from "../../domain/entities/Product";
+import type { Familia, Subgrupo } from "../../domain/entities/Product";
 
 export interface FamiliesResponse extends Familia{
     groups: {
