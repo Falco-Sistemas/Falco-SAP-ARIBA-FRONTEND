@@ -80,7 +80,7 @@ export class ProductRepositoryImpl implements ProductRepository {
                 color: p.cor,
                 size: p.tamanho,
                 stock: p.saldo,
-                imageUrl: p.fotos[0] ? `${this.baseUrl}${p.fotos[0]}` : '/src/assets/images/WhiteLabelImage.jpg',
+                imageUrl: p.fotos[0] ? `${this.baseUrl}${p.fotos[0]}` : new URL('../../assets/images/WhiteLabelImage.jpg', import.meta.url).href,
                 family: p.familia,
                 group: p.grupo,
                 subgroup: p.subgrupo
@@ -118,9 +118,9 @@ export class ProductRepositoryImpl implements ProductRepository {
             }
 
 
-            const images = produto.fotos.length > 0 ? produto.fotos.map((foto: string) => `${this.baseUrl}${foto}`) : ['/src/assets/images/WhiteLabelImage.jpg']
+            const images = produto.fotos.length > 0 ? produto.fotos.map((foto: string) => `${this.baseUrl}${foto}`) : [new URL('../../assets/images/WhiteLabelImage.jpg', import.meta.url).href]
             const relacionados: CatalogProduct[] = produto.relacionados.map(rel => {
-                const relFoto = produto.fotos.length > 0 ? `${this.baseUrl}${produto.fotos.at(0)}` : '/src/assets/images/WhiteLabelImage.jpg'
+                const relFoto = produto.fotos.length > 0 ? `${this.baseUrl}${produto.fotos.at(0)}` : new URL('../../assets/images/WhiteLabelImage.jpg', import.meta.url).href
 
                 return {
                     id: rel.codigo,
