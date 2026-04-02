@@ -42,7 +42,7 @@ function CartPage() {
         }
 
         // Fetch extra session info from API
-        const url = `http://localhost:3000/session/${sessionId}`;
+        const url = `${import.meta.env.VITE_API_URL ?? 'http://localhost:3000'}/session/${sessionId}`;
         const response = await fetch(url);
         if (!response.ok) {
             alert('Erro ao buscar dados da sessão.');
