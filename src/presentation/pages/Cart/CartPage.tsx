@@ -6,7 +6,7 @@ import CartItem from '../../components/Cart/CartItem/CartItem';
 import CartSummary from '../../components/Cart/CartSummary/CartSummary';
 import { useCart } from '../../contexts/CartContext';
 import { useSession } from '../../contexts/SessionContext';
-import { buildPunchOutOrderMessage, submitPunchOutOrder } from '../../../infrastructure/punchout/buildPunchOutOrderMessage';
+import { submitPunchOutOrder } from '../../../infrastructure/punchout/buildPunchOutOrderMessage';
 
 const tabs = [
     { id: 'cart', label: 'Carrinho de Compras' },
@@ -41,25 +41,28 @@ function CartPage() {
             return;
         }
 
-        // Fetch extra session info from API
-        const url = `${import.meta.env.VITE_API_URL ?? 'http://localhost:3000'}/session/${sessionId}`;
-        const response = await fetch(url);
-        if (!response.ok) {
-            alert('Erro ao buscar dados da sessão.');
+        // O backend monta o cXML (revalidando preço/estoque reais no banco) e
+        // devolve o XML pronto junto com a URL de retorno do comprador.
+        const apiUrl = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+        const cartResponse = await fetch(`${apiUrl}/ariba/cart`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sessionId,
+                items: items.map((item) => ({
+                    produtoId: item.id,
+                    quantidade: item.quantity,
+                })),
+            }),
+        });
+
+        if (!cartResponse.ok) {
+            const errorBody = await cartResponse.json().catch(() => null);
+            alert(errorBody?.message || 'Erro ao montar o carrinho para envio.');
             return;
         }
 
-        const data = await response.json();
-        const buyerIdentity = String(data.buyerIdentity_vc);
-        const supplierIdentity = String(data.parceiroAribaIdentity_vc);
-        const sessionPostUrl = String(data.punchoutUrl_vc);
-
-        const xml = buildPunchOutOrderMessage({
-            buyerCookie: sessionId,
-            items,
-            buyerIdentity,
-            supplierIdentity,
-        });
+        const { xml, postUrl } = await cartResponse.json();
 
         console.log('PunchOut XML:', xml);
 
@@ -70,7 +73,7 @@ function CartPage() {
         const orderTotalItems = totalItems;
         const orderTotalPrice = items.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0);
 
-        await submitPunchOutOrder(sessionPostUrl, xml);
+        await submitPunchOutOrder(postUrl, xml);
         clearCart();
 
         navigate('/pedido-sucesso', {
