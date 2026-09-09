@@ -64,7 +64,7 @@ export default function CartPage() {
             const input = document.createElement('input')
             input.type = 'hidden'
             input.name = 'cXML-urlencoded'
-            input.value = encodeURIComponent(xml)
+            input.value = xml
 
             form.appendChild(input)
             document.body.appendChild(form)
