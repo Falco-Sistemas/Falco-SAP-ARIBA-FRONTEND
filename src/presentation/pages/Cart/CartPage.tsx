@@ -14,7 +14,7 @@ const tabs = [
 
 export default function CartPage() {
     const navigate = useNavigate();
-    const { items, totalItems, updateQuantity, removeFromCart, clearCart } = useCart();
+    const { items, totalItems, updateQuantity, removeFromCart } = useCart();
     const { sessionId } = useSession();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -70,7 +70,6 @@ export default function CartPage() {
             document.body.appendChild(form)
             form.submit()
 
-            clearCart()
         } catch (err: any) {
             setError(err.message || 'Ocorreu um erro inesperado. Tente novamente.')
         } finally {
