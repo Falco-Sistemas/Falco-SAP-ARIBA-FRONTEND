@@ -35,7 +35,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             const newItem: CartItem = {
                 id: product.id,
                 name: product.name,
-                price: product.price,
+                price: Number(product.price) || 0,
                 quantity,
                 color: product.color,
                 size: product.size,
