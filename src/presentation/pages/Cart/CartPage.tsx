@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCart } from '../../contexts/CartContext';
 import { useSession } from '../../contexts/SessionContext';
+import { FaLeaf } from 'react-icons/fa';
 import './CartPage.css';
 
 export default function CartPage() {
@@ -80,6 +81,15 @@ export default function CartPage() {
                     ) : (
                         items.map(item => (
                             <div key={item.id} className="cart-item">
+                                <div className="cart-item-image">
+                                    {item.imageUrl ? (
+                                        <img src={item.imageUrl} alt={item.name} />
+                                    ) : (
+                                        <div className="cart-image-placeholder">
+                                            <FaLeaf className="cart-placeholder-icon" />
+                                        </div>
+                                    )}
+                                </div>
                                 <div className="cart-item-info">
                                     <span className="cart-item-name">{item.name}</span>
                                     <span className="cart-item-price">R$ {item.price.toFixed(2)}</span>
