@@ -1,14 +1,31 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { useSession } from '../../contexts/SessionContext';
-import { FaLeaf } from 'react-icons/fa';
+import CartNavigation from '../../components/Cart/CartNavigation/CartNavigation';
+import CartItem from '../../components/Cart/CartItem/CartItem';
+import CartSummary from '../../components/Cart/CartSummary/CartSummary';
 import './CartPage.css';
 
+const tabs = [
+    { id: 'catalogo', label: 'Catálogo' },
+    { id: 'carrinho', label: 'Carrinho' },
+];
+
 export default function CartPage() {
-    const { items, totalPrice, removeFromCart, updateQuantity, clearCart } = useCart();
+    const navigate = useNavigate();
+    const { items, totalItems, updateQuantity, removeFromCart, clearCart } = useCart();
     const { sessionId } = useSession();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    const handleTabChange = (tabId: string) => {
+        navigate(tabId === 'catalogo' ? '/' : '/carrinho');
+    };
+
+    const handleContinueShopping = () => {
+        navigate('/');
+    };
 
     const handleCheckout = async () => {
         if (!sessionId) {
@@ -63,6 +80,13 @@ export default function CartPage() {
 
     return (
         <div className="cart-page">
+            <CartNavigation
+                tabs={tabs}
+                activeTab="carrinho"
+                onTabChange={handleTabChange}
+                cartItemCount={totalItems}
+            />
+
             <div className="cart-content">
                 <div className="cart-items-container">
                     {error && (
@@ -74,52 +98,28 @@ export default function CartPage() {
                     {items.length === 0 ? (
                         <div className="empty-cart">
                             <p>Seu carrinho está vazio.</p>
-                            <button className="continue-shopping-btn" onClick={() => history.back()}>
+                            <button className="continue-shopping-btn" onClick={handleContinueShopping}>
                                 Continuar comprando
                             </button>
                         </div>
                     ) : (
                         items.map(item => (
-                            <div key={item.id} className="cart-item">
-                                <div className="cart-item-image">
-                                    {item.imageUrl ? (
-                                        <img src={item.imageUrl} alt={item.name} />
-                                    ) : (
-                                        <div className="cart-image-placeholder">
-                                            <FaLeaf className="cart-placeholder-icon" />
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="cart-item-info">
-                                    <span className="cart-item-name">{item.name}</span>
-                                    <span className="cart-item-price">R$ {item.price.toFixed(2)}</span>
-                                </div>
-                                <div className="cart-item-actions">
-                                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} disabled={item.quantity <= 1}>-</button>
-                                    <span>{item.quantity}</span>
-                                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
-                                    <button className="remove-btn" onClick={() => removeFromCart(item.id)}>Remover</button>
-                                </div>
-                            </div>
+                            <CartItem
+                                key={item.id}
+                                item={item}
+                                onQuantityChange={updateQuantity}
+                                onRemove={removeFromCart}
+                            />
                         ))
                     )}
                 </div>
 
                 {items.length > 0 && (
-                    <div className="cart-summary">
-                        <h3>Resumo do pedido</h3>
-                        <div className="cart-total">
-                            <span>Total:</span>
-                            <span>R$ {totalPrice.toFixed(2)}</span>
-                        </div>
-                        <button
-                            className="checkout-btn"
-                            onClick={handleCheckout}
-                            disabled={loading}
-                        >
-                            {loading ? 'Processando...' : 'Finalizar pedido'}
-                        </button>
-                    </div>
+                    <CartSummary
+                        items={items}
+                        onPunchOut={handleCheckout}
+                        isProcessing={loading}
+                    />
                 )}
             </div>
         </div>

@@ -4,9 +4,10 @@ import type { CartItem } from '../../../../domain/entities/Cart';
 interface CartSummaryProps {
     items: CartItem[];
     onPunchOut: () => void;
+    isProcessing?: boolean;
 }
 
-function CartSummary({ items, onPunchOut }: CartSummaryProps) {
+function CartSummary({ items, onPunchOut, isProcessing = false }: CartSummaryProps) {
     const formatPrice = (value: number): string => {
         return value.toLocaleString('pt-BR', {
             style: 'currency',
@@ -49,8 +50,8 @@ function CartSummary({ items, onPunchOut }: CartSummaryProps) {
                 </div>
             </div>
 
-            <button className="punchout-btn" onClick={onPunchOut}>
-                Finalizar Pedido (PunchOut)
+            <button className="punchout-btn" onClick={onPunchOut} disabled={isProcessing}>
+                {isProcessing ? 'Processando...' : 'Finalizar pedido'}
             </button>
         </div>
     );

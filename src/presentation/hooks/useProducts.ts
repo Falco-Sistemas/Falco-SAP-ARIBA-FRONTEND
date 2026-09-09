@@ -83,7 +83,14 @@ export function useProducts(itemsPerPage: number = 8): UseProductsReturn {
                 groupId: categoryFilters.grupo,
                 subgroupId: categoryFilters.subgrupo
             });
-            setAllProducts(response.data);
+
+            // Backend pode retornar price como string — normaliza para number
+            const normalized = response.data.map((p) => ({
+                ...p,
+                price: Number(p.price) || 0,
+            }));
+
+            setAllProducts(normalized);
         } catch (err) {
             setError('Erro ao carregar produtos. Tente novamente.');
             console.error('Error fetching products:', err);
