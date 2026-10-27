@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import './CatalogNavigation.css';
 import { FiSearch } from 'react-icons/fi';
 import { FaShoppingCart } from 'react-icons/fa';
-import logoImg from '../../../../assets/images/logo-falco-temp.png';
+import logoImg from '../../../../assets/images/logo.png';
 
 interface CatalogNavigationProps {
     title: string;
